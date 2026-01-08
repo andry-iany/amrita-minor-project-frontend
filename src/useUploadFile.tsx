@@ -1,36 +1,38 @@
 import { useState } from "react";
 import type { TPrediction } from "./type";
 
-const useGetPredictions = () => {
+const useUploadFile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getPredictions = async (texts: string[]): Promise<TPrediction[]> => {
+  const uploadFile = async (file: File): Promise<TPrediction[]>  => {
     setLoading(true);
     setError(null);
 
+    const formData = new FormData();
+    formData.append("file", file);
+
     try {
-      const response = await fetch("http://localhost:8000/predict", {
+      const response = await fetch("http://localhost:8000/upload/predict", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ texts }),
+        body: formData,
       });
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`);
+        throw new Error("Failed to upload file");
       }
 
       const result = (await response.json()) as {
         input_received: string[];
         predictions: number[];
       };
+
       const mappedResponses = result.input_received.map((text, index) => ({
         id: Date.now() + index, // Generate unique ID
         text,
         prediction: result.predictions[index],
       }));
+
       return mappedResponses;
     } catch (err: any) {
       setError(err.message || "An unknown error occurred");
@@ -40,7 +42,7 @@ const useGetPredictions = () => {
     }
   };
 
-  return { getPredictions, loading, error };
+  return { uploadFile, loading, error };
 };
 
-export default useGetPredictions;
+export default useUploadFile;

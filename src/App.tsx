@@ -10,45 +10,19 @@ import {
 import "./App.css";
 import { ArrowUpIcon } from "@/components/icons/il-arrow-up";
 import { ArrowDownIcon } from "@/components/icons/il-arrow-down";
-import useGetPredictions from "./useGetPredictions";
-import type { TPrediction } from "./useGetPredictions";
-
-const sampleReviews = [
-  "The movie was fantastic!",
-  "I did not enjoy the film.",
-  "An absolute masterpiece.",
-  "It was a waste of time.",
-  "The acting was superb.",
-  "The plot was predictable.",
-  "A visual spectacle.",
-  "The dialogue was poorly written.",
-  "An emotional rollercoaster.",
-  "I wouldn't recommend it.",
-];
+import type { TPrediction } from "./type";
+import Uploader from "./Uploader";
 
 function App() {
-  const { getPredictions, loading, error } = useGetPredictions();
   const [predictions, setPredictions] = useState<TPrediction[]>([]);
-
-  useEffect(() => {
-    const fetchPredictions = async () => {
-      try {
-        const result = await getPredictions(sampleReviews);
-        setPredictions(result);
-      } catch (err) {
-        console.error("Error fetching predictions:", err);
-      }
-    };
-
-    fetchPredictions();
-  }, []);
 
   return (
     <main className="max-w-4xl mx-auto">
       <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance mt-6 mb-9">
         Sentiment analysis
       </h1>
-      <Table>
+      <Uploader setPredictions={setPredictions}/>
+      <Table className="my-5">
         <TableHeader>
           <TableRow>
             <TableHead className="text-lg font-bold">Text</TableHead>
@@ -58,10 +32,8 @@ function App() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {loading && <p className="py-3">Loading predictions...</p>}
-          {error && <p className="text-red-500 py-3">Error: {error}</p>}
-          {!loading &&
-            !error &&
+          {!predictions.length && <p className="py-3">No data</p>}
+          {
             predictions.map((response) => (
               <TableRow key={response.id}>
                 <TableCell className="text-left whitespace-normal pe-3">
