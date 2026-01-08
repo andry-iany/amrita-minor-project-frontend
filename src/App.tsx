@@ -49,7 +49,7 @@ function App() {
           )}
           {predictions.map((response) => (
             <TableRow key={response.id}>
-              <TableCell className="text-left whitespace-normal pe-3">
+              <TableCell className="text-left whitespace-normal pe-5">
                 {response.text}
               </TableCell>
               <TableCell>{renderPredictionIcon(response.prediction)}</TableCell>

@@ -29,6 +29,7 @@ const Uploader = ({setPredictions}: TProps) => {
       onDrop={handleDrop}
       onError={console.error}
       src={files}
+      className='bg-gray-50'
     >
       <DropzoneEmptyState />
       <DropzoneContent />
