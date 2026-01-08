@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,6 +12,7 @@ import { ArrowUpIcon } from "@/components/icons/il-arrow-up";
 import { ArrowDownIcon } from "@/components/icons/il-arrow-down";
 import type { TPrediction } from "./type";
 import Uploader from "./Uploader";
+import { Button } from "./components/ui/button";
 
 function App() {
   const [predictions, setPredictions] = useState<TPrediction[]>([]);
@@ -21,7 +22,14 @@ function App() {
       <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance mt-6 mb-9">
         Sentiment analysis
       </h1>
-      <Uploader setPredictions={setPredictions}/>
+      <Uploader setPredictions={setPredictions} />
+      <Button
+        className="mt-6 mb-3"
+        disabled={!predictions.length}
+        onClick={() => setPredictions([])}
+      >
+        Reset
+      </Button>
       <Table className="my-5">
         <TableHeader>
           <TableRow>
@@ -32,18 +40,21 @@ function App() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {!predictions.length && <p className="py-3">No data</p>}
-          {
-            predictions.map((response) => (
-              <TableRow key={response.id}>
-                <TableCell className="text-left whitespace-normal pe-3">
-                  {response.text}
-                </TableCell>
-                <TableCell>
-                  {renderPredictionIcon(response.prediction)}
-                </TableCell>
-              </TableRow>
-            ))}
+          {!predictions.length && (
+            <TableRow>
+              <TableCell colSpan={2}>
+                <p className="py-3">No data</p>
+              </TableCell>
+            </TableRow>
+          )}
+          {predictions.map((response) => (
+            <TableRow key={response.id}>
+              <TableCell className="text-left whitespace-normal pe-3">
+                {response.text}
+              </TableCell>
+              <TableCell>{renderPredictionIcon(response.prediction)}</TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </main>
