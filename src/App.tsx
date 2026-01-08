@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -9,54 +10,38 @@ import {
 import "./App.css";
 import { ArrowUpIcon } from "@/components/icons/il-arrow-up";
 import { ArrowDownIcon } from "@/components/icons/il-arrow-down";
+import useGetPredictions from "./useGetPredictions";
+import type { TPrediction } from "./useGetPredictions";
 
-const responses = [
-  // {
-  //   id: 0,
-  //   text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem recusandae dolores provident consectetur, eius accusantium quaerat reprehenderit voluptatum nemo amet tempore. Nobis possimus facilis quisquam omnis quo a, inventore culpa laboriosam maiores nisi dolorem totam aperiam eveniet quaerat earum ducimus. Tempore nulla laudantium sequi nam deserunt quis eveniet, quod, perspiciatis quaerat non ullam maiores atque deleniti quas dolor. Modi excepturi impedit placeat, optio natus, aliquid neque, corrupti dolores possimus sed facilis qui commodi exercitationem corporis ad itaque quo molestiae odit. Eveniet repellat optio quisquam aperiam officia enim hic iste dolores itaque eaque in totam at rem sit, minima quidem. Voluptatum.",
-  //   prediction: 0.3,
-  // },
-  {
-    id: 1,
-    text: "this is one text",
-    prediction: 0.5,
-  },
-  {
-    id: 2,
-    text: "this is one text",
-    prediction: 0.7,
-  },
-  {
-    id: 3,
-    text: "this is one text",
-    prediction: 0.9999,
-  },
-  {
-    id: 4,
-    text: "this is one text",
-    prediction: 0.3,
-  },
-  {
-    id: 5,
-    text: "this is one text",
-    prediction: 0.3,
-  },
+const sampleReviews = [
+  "The movie was fantastic!",
+  "I did not enjoy the film.",
+  "An absolute masterpiece.",
+  "It was a waste of time.",
+  "The acting was superb.",
+  "The plot was predictable.",
+  "A visual spectacle.",
+  "The dialogue was poorly written.",
+  "An emotional rollercoaster.",
+  "I wouldn't recommend it.",
 ];
 
 function App() {
-  const renderPredictionIcon = (prediction: number) => {
-    const formattedPrediction = Math.trunc(prediction * 100) / 100;
-    return (
-      <div>
-        {formattedPrediction >= 0.5 ? (
-          <ArrowUpIcon className="mx-auto" />
-        ) : (
-          <ArrowDownIcon className="mx-auto" />
-        )}
-        <span className="ms-1 text-[12px]">[{formattedPrediction}]</span>
-      </div>
-    );
-  };
+  const { getPredictions, loading, error } = useGetPredictions();
+  const [predictions, setPredictions] = useState<TPrediction[]>([]);
+
+  useEffect(() => {
+    const fetchPredictions = async () => {
+      try {
+        const result = await getPredictions(sampleReviews);
+        setPredictions(result);
+      } catch (err) {
+        console.error("Error fetching predictions:", err);
+      }
+    };
+
+    fetchPredictions();
+  }, []);
 
   return (
     <main className="max-w-4xl mx-auto">
@@ -73,18 +58,38 @@ function App() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {responses.map((response) => (
-            <TableRow key={response.id}>
-              <TableCell className="text-left whitespace-normal pe-3">
-                {response.text}
-              </TableCell>
-              <TableCell>{renderPredictionIcon(response.prediction)}</TableCell>
-            </TableRow>
-          ))}
+          {loading && <p className="py-3">Loading predictions...</p>}
+          {error && <p className="text-red-500 py-3">Error: {error}</p>}
+          {!loading &&
+            !error &&
+            predictions.map((response) => (
+              <TableRow key={response.id}>
+                <TableCell className="text-left whitespace-normal pe-3">
+                  {response.text}
+                </TableCell>
+                <TableCell>
+                  {renderPredictionIcon(response.prediction)}
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </main>
   );
 }
+
+const renderPredictionIcon = (prediction: number) => {
+  const formattedPrediction = Math.trunc(prediction * 100) / 100;
+  return (
+    <div>
+      {formattedPrediction >= 0.5 ? (
+        <ArrowUpIcon className="mx-auto" />
+      ) : (
+        <ArrowDownIcon className="mx-auto" />
+      )}
+      <span className="ms-1 text-[12px]">[{formattedPrediction}]</span>
+    </div>
+  );
+};
 
 export default App;
