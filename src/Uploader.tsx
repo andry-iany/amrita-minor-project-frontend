@@ -25,7 +25,7 @@ const Uploader = ({setPredictions}: TProps) => {
   return (
     <Dropzone
       maxSize={1024 * 1024 * 10}
-      minSize={1024}
+      minSize={32}
       onDrop={handleDrop}
       onError={console.error}
       src={files}
